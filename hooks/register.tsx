@@ -16,13 +16,6 @@ const ctx = atom({ plugin: 'token-diet', key: 'ctx' } as const, 0)
 const hiddenAt = atom({ plugin: 'token-diet', key: 'hiddenUntil' } as const, 0)
 
 export const register: Register = on => {
-  let lastPrompt = ''
-
-  on('prompt.submit', ($, e, next) => {
-    if (!e.command && e.origin?.kind !== 'plugin') lastPrompt = e.text
-    return next(e)
-  })
-
   on('turn.complete', async ($, e, next) => {
     const result = await next(e)
     if (e.agentId === undefined) {
@@ -37,14 +30,12 @@ export const register: Register = on => {
     if (e.props.hasSurvey || e.props.isWorking || tokens < MIN_CTX || tokens < (await read($, hiddenAt)) + STEP) return next(e)
 
     const { Box, Button, Text } = $.ui.resolve(e)
-    const clear = async (resend: boolean) => {
-      const prompt = lastPrompt
+    const clear = async () => {
       const draft = (await $.prompt.read()).text
       await $.command.run({ command: 'clear' })
       await update($, ctx, () => 0)
       await update($, hiddenAt, () => 0)
-      if (resend && prompt) await $.prompt.submit({ text: prompt, asUser: true })
-      else if (draft) await $.prompt.fill({ text: draft })
+      if (draft) await $.prompt.fill({ text: draft })
     }
 
     // Queued by the engine until the session is idle, so it never cuts a running turn.
@@ -63,9 +54,8 @@ export const register: Register = on => {
         <Text color={tone}>{'▰'.repeat(cells)}<Text dimColor>{'▱'.repeat(BAR - cells)}</Text></Text>
         <Text color={tone} bold tabular>{Math.round(tokens / 1000)}K</Text>
         <Text dimColor>tarea nueva?</Text>
-        <Button key="resend" label="limpiar y repetir" hotkey="1" plain dimColor onPress={() => clear(true)} />
-        <Button key="clear" label="limpiar" hotkey="2" plain dimColor onPress={() => clear(false)} />
-        {tokens >= COMPACT_CTX && <Button key="compact" label="compactar" hotkey="4" plain dimColor onPress={compact} />}
+        <Button key="clear" label="limpiar" hotkey="1" plain dimColor onPress={clear} />
+        {tokens >= COMPACT_CTX && <Button key="compact" label="compactar" hotkey="2" plain dimColor onPress={compact} />}
         <Button key="hide" label="ocultar" hotkey="3" plain dimColor role="dismiss" onPress={() => update($, hiddenAt, () => tokens)} />
       </Box>
     )

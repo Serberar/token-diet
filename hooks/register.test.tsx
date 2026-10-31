@@ -29,21 +29,6 @@ test('big context: Limpiar runs /clear and keeps the draft', async ($, on) => {
   await ui.unmount()
 })
 
-test('Limpiar y repetir resends the last typed prompt', async ($, on) => {
-  const sent: string[] = []
-  on('state.get', seed(150_000))
-  on('state.set', () => ({ value: { isSet: true } }))
-  on('prompt.read', () => ({ value: { text: '', cursor: 0 } }))
-  on('command.run', () => ({}))
-  on('prompt.submit', (_, e) => { sent.push(e.text); return { text: e.text } })
-
-  await $.prompt.submit({ text: 'haz el login nuevo', asUser: true })
-  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
-  await ui.press({ key: 'resend' })
-  expect(sent.at(-1)).toBe('haz el login nuevo')
-  await ui.unmount()
-})
-
 test('compactar runs /compact with keep instructions, only from 100K', async ($, on) => {
   const ran: string[] = []
   on('state.get', seed(120_000))

@@ -2,7 +2,29 @@
 
 Plugin para que tu cuota de Claude Code dure mas, sin bajar la calidad del codigo. No comprime la salida de los comandos: para eso sigue usando una herramienta aparte (por ejemplo RTK).
 
-En transcripciones reales, cerca del 80% del coste ponderado son lecturas de cache: el contexto entero se reenvia en cada llamada al modelo. Y las imagenes leidas al revisar capturas son el 95% de todo lo que devuelven las herramientas. Por eso este plugin ataca el tamano del contexto, no solo la prosa.
+En transcripciones reales, mas del 70% del coste ponderado son lecturas de cache: el contexto entero se reenvia en cada llamada al modelo. Las respuestas de Claude son solo un 7%. Por eso este plugin ataca el tamano del contexto, no solo la prosa.
+
+## Cuanto ahorra
+
+Estimado sobre unas 5.700 llamadas reales al modelo (17 sesiones de programacion), con los pesos de coste de la API. Partiendo de 100:
+
+| Como lo usas | Coste | Ahorro |
+|---|---|---|
+| Sin nada | 100 | - |
+| Solo el ajuste recomendado (abajo) | 57 | 43% |
+| Ajuste + plugin, sin tocar la banda | 55 | **45%** |
+| Ajuste + plugin, usandolo bien (ver abajo) | 47 | **53%** |
+
+El plugin por si solo, sin hacer nada, ahorra un 3%: reglas de respuesta (1%), aviso tras una pausa (1-2%) y capturas reducidas (0,2%). El resto sale de compactar o limpiar al acabar cada tarea. Limpiar al cambiar de tarea ahorra aun mas, pero no se puede medir en las transcripciones y no esta contado.
+
+## Como usarlo bien
+
+1. **Pon el ajuste recomendado** (`CLAUDE_CODE_AUTO_COMPACT_WINDOW`, abajo). Es el mayor ahorro y no lo puede poner un plugin.
+2. **Al acabar una tarea, pulsa `4` compactar** si la banda lo ofrece (desde 100K). Conservas el hilo y el contexto baja. Nunca corta una tarea a medias: solo se ejecuta cuando Claude ha terminado.
+3. **Al empezar algo que no tiene que ver, pulsa `1` o `2`** (`/clear`). Vuelves al contexto minimo; la conversacion anterior se pierde.
+4. **Si el aviso tras una pausa te para, haz caso** salvo que sigas con lo mismo: tras una hora la cache ha caducado y seguir reescribe todo el contexto.
+5. **Usa RTK al lado** para comprimir la salida de los comandos, que este plugin no toca.
+6. **Revisa capturas con el agente `visual-check`** en vez de leerlas en la conversacion principal.
 
 ## Instalar
 

@@ -5,8 +5,11 @@ import type { Register } from 'claude-code'
 // The band is UI only and costs no tokens, so it shows early.
 const MIN_CTX = 50_000
 const STEP = 50_000
-// Meter scale: matches CLAUDE_CODE_AUTO_COMPACT_WINDOW in ~/.claude/settings.json.
-const WINDOW = 200_000
+// Compacting keeps the thread, so it is offered once the context is worth shrinking.
+const COMPACT_CTX = 100_000
+const KEEP = 'Conserva rutas de archivo, decisiones tomadas, errores encontrados y pasos pendientes.'
+// Meter scale: the auto-compact window if set, else 200K.
+const WINDOW = Number(globalThis.process?.env?.CLAUDE_CODE_AUTO_COMPACT_WINDOW) || 200_000
 const BAR = 8
 
 const ctx = atom({ plugin: 'token-diet', key: 'ctx' } as const, 0)
@@ -31,7 +34,7 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const tokens = await read($, ctx)
-    if (e.props.hasSurvey || tokens < MIN_CTX || tokens < (await read($, hiddenAt)) + STEP) return next(e)
+    if (e.props.hasSurvey || e.props.isWorking || tokens < MIN_CTX || tokens < (await read($, hiddenAt)) + STEP) return next(e)
 
     const { Box, Button, Text } = $.ui.resolve(e)
     const clear = async (resend: boolean) => {
@@ -42,6 +45,13 @@ export const register: Register = on => {
       await update($, hiddenAt, () => 0)
       if (resend && prompt) await $.prompt.submit({ text: prompt, asUser: true })
       else if (draft) await $.prompt.fill({ text: draft })
+    }
+
+    // Queued by the engine until the session is idle, so it never cuts a running turn.
+    const compact = async () => {
+      await $.command.run({ command: 'compact', args: KEEP })
+      await update($, ctx, () => 0)
+      await update($, hiddenAt, () => 0)
     }
 
     const fill = Math.min(1, tokens / WINDOW)
@@ -55,6 +65,7 @@ export const register: Register = on => {
         <Text dimColor>tarea nueva?</Text>
         <Button key="resend" label="limpiar y repetir" hotkey="1" plain dimColor onPress={() => clear(true)} />
         <Button key="clear" label="limpiar" hotkey="2" plain dimColor onPress={() => clear(false)} />
+        {tokens >= COMPACT_CTX && <Button key="compact" label="compactar" hotkey="4" plain dimColor onPress={compact} />}
         <Button key="hide" label="ocultar" hotkey="3" plain dimColor role="dismiss" onPress={() => update($, hiddenAt, () => tokens)} />
       </Box>
     )

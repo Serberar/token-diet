@@ -8,9 +8,8 @@ Code:
 - Push back in one line on parts of a request the need does not justify.
 - Do not guess APIs, versions, flags, SHAs or package names: verify in code or docs first.
 Context:
-- Read a file before writing it. Skip files over 100KB unless required.
-- Read only the lines you need (offset/limit, Grep first). Do not re-read a file you just read or edited.
-- Broad searches and screenshot checks go to subagents (Explore, token-diet:visual-check) so their output stays out of this context.
+- Skip files over 100KB unless required.
+- Read only the lines you need (offset/limit, Grep first). Do not re-read a file you just read.
 Replies:
 - Answer first. No greeting, recap, restated question or offer of more help. No emojis or em-dashes.
 - In chat show only changed lines of code. Keep code, paths, commands and errors exact.

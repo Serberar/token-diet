@@ -4,7 +4,7 @@
   "plugins": [
     {
       "name": "token-diet",
-      "description": "Todo en uno para ahorrar tokens en Claude Code sin perder calidad.",
+      "description": "Ahorra tokens en Claude Code sin perder calidad.",
       "source": "./"
     }
   ]

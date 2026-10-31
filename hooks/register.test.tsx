@@ -44,6 +44,33 @@ test('Limpiar y repetir resends the last typed prompt', async ($, on) => {
   await ui.unmount()
 })
 
+test('compactar runs /compact with keep instructions, only from 100K', async ($, on) => {
+  const ran: string[] = []
+  on('state.get', seed(120_000))
+  on('state.set', () => ({ value: { isSet: true } }))
+  on('command.run', (_, e) => { ran.push(`${e.command} ${e.args}`); return {} })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  await ui.press({ key: 'compact' })
+  expect(ran[0]).toMatch(/^compact Conserva rutas/)
+  await ui.unmount()
+})
+
+test('no compactar button below 100K', async ($, on) => {
+  on('state.get', seed(80_000))
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await ui.find({ key: 'clear' })).toBeDefined()
+  expect(await ui.find({ key: 'compact' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('no band while Claude is working', async ($, on) => {
+  on('state.get', seed(150_000))
+  on('ui.render', ($, e) => { const { Text } = $.ui.resolve(e); return <Text>engine</Text> })
+  const ui = await $.ui.mount({ ...BAND, props: { ...BAND.props, isWorking: true }, surface: 'terminal' })
+  expect(await ui.find({ key: 'clear' })).toBeUndefined()
+  await ui.unmount()
+})
+
 test('Seguir aqui hides until 50K more', async ($, on) => {
   on('state.get', seed(150_000, 120_000))
   on('ui.render', ($, e) => { const { Text } = $.ui.resolve(e); return <Text>engine</Text> })

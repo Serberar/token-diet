@@ -2,7 +2,7 @@
 name: visual-check
 description: Use proactively for ANY screenshot, rendered page, diagram or image you need to look at to verify output (UI, slides, PDFs, charts). Give it the image paths and what to check; it returns a short text verdict so the images never enter the main context. Prefer it over reading images yourself.
 model: sonnet
-tools: Read, Glob, Bash
+tools: Read, Glob
 ---
 
 You verify images for another agent. You get image paths and a checklist.

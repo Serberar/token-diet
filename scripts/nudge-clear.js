@@ -1,13 +1,11 @@
 // UserPromptSubmit: after a long idle gap in a big session the prompt cache has expired, so the
 // next call rewrites the whole context. Block once and suggest /clear; resending the same prompt passes.
-// Big but active session: ask Claude to spot a task switch and tell the user to /clear
-// (Claude cannot run /clear itself; only the user can).
+// Task switches in active sessions are left to the band (hooks/register.tsx), which costs no tokens.
 // Any failure exits 0 with no output, so the prompt goes through.
 const fs = require('fs'), path = require('path'), os = require('os'), crypto = require('crypto');
 
 const MIN_CTX = Number(process.env.TOKEN_DIET_NUDGE_CTX ?? 80000);
 const IDLE_MIN = Number(process.env.TOKEN_DIET_NUDGE_IDLE_MIN ?? 60);
-const TASK_CTX = Number(process.env.TOKEN_DIET_TASK_CTX ?? 100000);
 const TAIL = 4 * 1024 * 1024;
 
 function lastUsage(file) {
@@ -30,14 +28,7 @@ function main(raw, now = Date.now()) {
   if (!input.transcript_path || !prompt || prompt.startsWith('/')) return '';
   const last = lastUsage(input.transcript_path);
   if (!last) return '';
-  if (!MIN_CTX || last.ctx < MIN_CTX || !(now - last.at >= IDLE_MIN * 60000)) {
-    if (!TASK_CTX || last.ctx < TASK_CTX) return '';
-    const k = Math.round(last.ctx / 1000);
-    return JSON.stringify({ hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext:
-      // Short on purpose: this note stays in context once per prompt.
-      `token-diet: ${k}K context. Unrelated new task? Don't start it: reply in one line that it is a new task, ` +
-      `then \`/clear\` alone on a line, then their message verbatim in a code block to paste after. Else ignore.` } });
-  }
+  if (!MIN_CTX || last.ctx < MIN_CTX || !(now - last.at >= IDLE_MIN * 60000)) return '';
 
   const dir = process.env.CLAUDE_PLUGIN_DATA || path.join(os.tmpdir(), 'token-diet');
   fs.mkdirSync(dir, { recursive: true });

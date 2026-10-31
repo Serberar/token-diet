@@ -13,7 +13,7 @@ const files = [];
   }
 })(root);
 
-const tot = { in: 0, cw: 0, cr: 0, out: 0, calls: 0 };
+const tot = { in: 0, cw: 0, cw1h: 0, cr: 0, out: 0, calls: 0 };
 const tools = {}, sessions = [];
 let imageReads = 0;
 for (const f of files) {
@@ -28,6 +28,7 @@ for (const f of files) {
         seen.add(m.id);
         const u = m.usage, ctx = (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0);
         tot.in += u.input_tokens || 0; tot.cw += u.cache_creation_input_tokens || 0;
+        tot.cw1h += u.cache_creation?.ephemeral_1h_input_tokens || 0;
         tot.cr += u.cache_read_input_tokens || 0; tot.out += u.output_tokens || 0; tot.calls++;
         s.calls++; s.sum += ctx; s.max = Math.max(s.max, ctx); s.cr += u.cache_read_input_tokens || 0;
       }
@@ -48,8 +49,8 @@ for (const f of files) {
 }
 
 const k = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n);
-// Relative weights vs uncached input: cache write 1.25x, cache read 0.1x, output 5x.
-const w = { 'lectura de cache': tot.cr * 0.1, 'escritura de cache': tot.cw * 1.25, salida: tot.out * 5, 'entrada sin cache': tot.in };
+// Relative weights vs uncached input: cache write 1.25x (5m TTL) or 2x (1h TTL), cache read 0.1x, output 5x.
+const w = { 'lectura de cache': tot.cr * 0.1, 'escritura de cache': (tot.cw - tot.cw1h) * 1.25 + tot.cw1h * 2, salida: tot.out * 5, 'entrada sin cache': tot.in };
 const W = Object.values(w).reduce((a, b) => a + b, 0) || 1;
 
 console.log(`Sesiones ${sessions.length}, llamadas al modelo ${tot.calls}${days ? `, ultimos ${days} dias` : ''}`);

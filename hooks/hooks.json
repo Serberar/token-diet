@@ -14,7 +14,8 @@
               "${CLAUDE_PLUGIN_ROOT}/scripts/rules.js",
               "SessionStart"
             ],
-            "timeout": 10
+            "timeout": 10,
+            "statusMessage": "token-diet: cargando reglas"
           }
         ]
       }
@@ -29,7 +30,8 @@
               "${CLAUDE_PLUGIN_ROOT}/scripts/rules.js",
               "SubagentStart"
             ],
-            "timeout": 10
+            "timeout": 10,
+            "statusMessage": "token-diet: cargando reglas"
           }
         ]
       }
@@ -43,7 +45,8 @@
             "args": [
               "${CLAUDE_PLUGIN_ROOT}/scripts/nudge-clear.js"
             ],
-            "timeout": 10
+            "timeout": 10,
+            "statusMessage": "token-diet: revisando el contexto"
           }
         ]
       }
@@ -58,7 +61,8 @@
             "args": [
               "${CLAUDE_PLUGIN_ROOT}/scripts/shrink-image.js"
             ],
-            "timeout": 30
+            "timeout": 30,
+            "statusMessage": "token-diet: revisando la imagen"
           }
         ]
       }

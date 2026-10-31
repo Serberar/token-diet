@@ -1,6 +1,6 @@
 {
   "name": "token-diet",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Para que tu cuota dure mas: reglas compactas de codigo y respuesta, imagenes reducidas, avisos y boton de /clear, y auditoria de tokens.",
   "author": {
     "name": "Serberar"

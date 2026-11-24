@@ -9,6 +9,6 @@ function main(event) {
 
 module.exports = { main };
 if (require.main === module) {
-  let out = ''; try { out = main(process.argv[2] || 'SessionStart'); } catch { }
+  let out = ''; try { out = main(process.argv[2] || 'SessionStart'); } catch { /* el gancho nunca debe frenar la sesión */ }
   if (out) process.stdout.write(out);
 }

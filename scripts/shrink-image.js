@@ -70,4 +70,4 @@ function main(raw) {
 }
 
 let raw = '';
-process.stdin.on('data', d => raw += d).on('end', () => { try { main(raw); } catch { } process.exit(0); });
+process.stdin.on('data', d => raw += d).on('end', () => { try { main(raw); } catch { /* el gancho nunca debe frenar la sesión */ } process.exit(0); });

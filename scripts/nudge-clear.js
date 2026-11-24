@@ -49,7 +49,7 @@ module.exports = { main };
 if (require.main === module) {
   let raw = '';
   process.stdin.on('data', d => raw += d).on('end', () => {
-    let out = ''; try { out = main(raw); } catch { }
+    let out = ''; try { out = main(raw); } catch { /* el gancho nunca debe frenar la sesión */ }
     if (out) process.stdout.write(out);
     process.exit(0);
   });

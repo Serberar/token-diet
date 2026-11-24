@@ -1,5 +1,7 @@
 # token-diet
 
+**Español** · [English](README.en.md)
+
 [![CI](https://github.com/Serberar/token-diet/actions/workflows/ci.yml/badge.svg)](https://github.com/Serberar/token-diet/actions/workflows/ci.yml)
 
 Plugin para que tu cuota de Claude Code dure mas, sin bajar la calidad del codigo. No comprime la salida de los comandos: para eso sigue usando una herramienta aparte (por ejemplo RTK).

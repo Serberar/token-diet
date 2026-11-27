@@ -2,8 +2,6 @@
 
 **Español** · [English](README.en.md)
 
-[![CI](https://github.com/Serberar/token-diet/actions/workflows/ci.yml/badge.svg)](https://github.com/Serberar/token-diet/actions/workflows/ci.yml)
-
 Plugin para que tu cuota de Claude Code dure más, sin bajar la calidad del codigo. No comprime la salida de los comandos: para eso sigue usando una herramienta aparte (por ejemplo RTK).
 
 En transcripciones reales, más del 70% del coste ponderado son lecturas de cache: el contexto entero se reenvía en cada llamada al modelo. Las respuestas de Claude son solo un 7%. Por eso este plugin ataca el tamaño del contexto, no solo la prosa.
